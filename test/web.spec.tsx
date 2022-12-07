@@ -15,7 +15,7 @@ const task = async () => {
 
 describe('web', () => {
   it('works', async () => {
-    const X = web('x', view(class props { }, ({ $, fx }) => {
+    const X = web('x', view(class props { }, class local { }, ({ $, fns }) => ({}), ({ $, fx }) => {
       fx(() => {
         $.view = <p>one</p>
       })
@@ -30,7 +30,7 @@ describe('web', () => {
   it('keyed add', async () => {
     const X = web('x', view(class props {
       count?= 1
-    }, ({ $, fx }) => {
+    }, class local { }, ({ $, fns }) => ({}), ({ $, fx }) => {
       fx(({ count }) => {
         $.view = Array.from({ length: count }, (_, i) =>
           <p key={i}>{i}</p>
@@ -56,7 +56,7 @@ describe('web', () => {
   it('keyed components add', async () => {
     const Y = view(class props {
       children?: JSX.Element
-    }, ({ $, fx }) => {
+    }, class local { }, ({ $, fns }) => ({}), ({ $, fx }) => {
       fx(({ children }) => {
         $.view = <p>{children}</p>
       })
@@ -64,7 +64,7 @@ describe('web', () => {
 
     const X = web('x', view(class props {
       count?= 1
-    }, ({ $, fx }) => {
+    }, class local { }, ({ $, fns }) => ({}), ({ $, fx }) => {
       fx(({ count }) => {
         $.view = Array.from({ length: count }, (_, i) =>
           <Y key={i}>{i}</Y>
@@ -92,7 +92,7 @@ describe('web', () => {
   it('keyed components unshift', async () => {
     const Y = view(class props {
       children?: JSX.Element
-    }, ({ $, fx }) => {
+    }, class local { }, ({ $, fns }) => ({}), ({ $, fx }) => {
       fx(({ children }) => {
         $.view = <p>{children}</p>
       })
@@ -100,7 +100,7 @@ describe('web', () => {
 
     const X = web('x', view(class props {
       count?= 1
-    }, ({ $, fx }) => {
+    }, class local { }, ({ $, fns }) => ({}), ({ $, fx }) => {
       fx(({ count }) => {
         $.view = Array.from({ length: count }, (_, i) =>
           <Y key={count - i}>{count - i}</Y>
@@ -139,7 +139,7 @@ describe('web', () => {
 
     const Y = view(class props {
       children?: JSX.Element
-    }, ({ $, fx }) => {
+    }, class local { }, ({ $, fns }) => ({}), ({ $, fx }) => {
       fx(({ children }) => {
         $.view = <p>{children}</p>
       })
@@ -147,7 +147,7 @@ describe('web', () => {
 
     const X = web('x', view(class props {
       count?= 1
-    }, ({ $, fx }) => {
+    }, class local { }, ({ $, fns }) => ({}), ({ $, fx }) => {
       fx(({ count }) => {
         const El = (_: any, i: number) =>
           <Y key={count - i}>{count - i}</Y>
