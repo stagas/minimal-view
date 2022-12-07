@@ -71,7 +71,7 @@
     "@typescript-eslint/parser": "5.31.0",
     "bunzee": "^1.0.0",
     "chokidar": "3.5.3",
-    "devito": "^2.0.0",
+    "devito": "^2.1.0",
     "dokio": "^1.1.0",
     "eslint": "8.20.0",
     "eslint-config-html-jsx": "^1.0.0",
@@ -83,14 +83,18 @@
     "rimraf": "3.0.2",
     "swcno": "0.1.1",
     "typescript": "4.7.3",
-    "utr": "^1.3.3"
+    "utr": "^1.3.4"
   },
   "dependencies": {
-    "argtor": "^2.0.0",
+    "argtor": "^3.0.0",
+    "event-toolkit": "^1.2.0",
+    "eventemitter-strict": "1.0.1",
     "everyday-types": "^1.1.0",
     "everyday-utils": "^1.3.0",
-    "html-vdom": "^2.2.3",
-    "minimal-reactive": "^1.0.1",
-    "proxy-toolkit": "^1.1.0"
+    "html-vdom": "^2.4.0",
+    "minimal-reactive": "^1.1.0",
+    "nested-css": "^3.0.8",
+    "proxy-toolkit": "^1.2.0",
+    "to-fluent": "^2.2.0"
   }
 }
