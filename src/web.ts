@@ -4,7 +4,8 @@ import { css as makeCss } from 'nested-css'
 
 import { getTag, Options } from './custom-elements'
 import { jsx, render } from './jsx-runtime'
-import { View, ViewState } from './minimal-view'
+import { State } from './state'
+import { View } from './view'
 
 export type WebElement<TName extends string = '', TProps = {}, TLocal = {}> = {
   new(): WebElement<TName, TProps, TLocal>
@@ -20,7 +21,7 @@ export type Component<TName extends string = '', TProps = {}, TLocal = {}> = (
   (props: TProps) => JSX.Element
 ) & {
   Fn: (props: TProps) => JSX.Element
-  Context: ViewState<TProps, TLocal>['$']
+  Context: State<TName, TProps, TLocal>['$']
   Element: Class<TProps & HTMLElement> & Component<TName, TProps, TLocal>
   toString(): string
 }
@@ -28,21 +29,20 @@ export type Component<TName extends string = '', TProps = {}, TLocal = {}> = (
 // export type Context<T extends Component<any, TProps, TLocal>, TProps = {}, TLocal = {}> = TProps & TLocal
 
 export function web<TName extends string = '', TProps = {}, TLocal = {}>(
-  name: TName,
-  fn: View<TProps, TLocal>,
+  fn: View<TName, TProps, TLocal & { css?: string }>,
   options?: Options<TProps>,
   parent: typeof HTMLElement = HTMLElement
 ): WebElement<TName, TProps, TLocal>['Web'] {
   fn.defaultProps = { css: '' }
   fn.onInit = (state, update) => {
-    state.name = name
+    // state.name = name
     state.fx(function updateCss({ css }) {
       (state.$ as any).__style =
         jsx('style', { children: makeCss`${css}`() }, void 0)
       update()
     })
   }
-  const tag = getTag(name)
+  const tag = getTag(fn.viewName)
 
   const Web: Component<TName, TProps, TLocal> = (props: TProps) =>
     jsx(tag, props, void 0)

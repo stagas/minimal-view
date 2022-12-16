@@ -13,9 +13,9 @@ const task = async () => {
   await Promise.resolve()
 }
 
-describe('web', () => {
+xdescribe('web', () => {
   it('works', async () => {
-    const X = web('x', view(class props { }, class local { }, ({ $, fns }) => ({}), ({ $, fx }) => {
+    const X = web(view('x', class props { }, class local { }, ({ $, fns }) => ({}), ({ $, fx }) => {
       fx(() => {
         $.view = <p>one</p>
       })

@@ -50,3 +50,5 @@ export class Fiber extends EventEmitter<{
     return lane
   }
 }
+
+export const fiber = new Fiber()

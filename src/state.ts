@@ -50,15 +50,19 @@ export class EffectOptions<T> extends FnOptions<T> {
 }
 
 export type Effect<T> = {
-  (deps: Deps<T>): Promise<OffFx | void> | OffFx | void
+  (deps: Deps<T>, prev: T): Promise<OffFx | void> | OffFx | void
 }
 
 export type Func<T, R extends (...args: unknown[]) => unknown> = {
-  (deps: Deps<T>): R
+  (deps: Deps<T>, prev: Deps<T>): R
 }
 
 export type Deps<T> = {
   [K in keyof T]-?: NonNullable<T[K]>
+}
+
+export type Props<T> = {
+  [K in keyof T]: NonNullable<T[K]>
 }
 
 export type Refs<T> = {
@@ -67,17 +71,21 @@ export type Refs<T> = {
 
 const stack: any[] = []
 
+export type Context<TName extends string, TProps, TLocal> = Props<TProps>
+  & TLocal
+  & {
+    self: State<TName, TProps, TLocal>,
+    deps: Boxs<TProps & TLocal>,
+  }
+
 export class State<
-  TProps = {},
-  TLocal = {},
-  T = (TProps extends void ? void : TProps)
-  & (TLocal extends void ? void : TLocal)
+  TName extends string,
+  TProps,
+  TLocal,
 > extends EventEmitter<{ change: (event: { fn: Effect<TProps & TLocal>, changes: Change[] }) => void }> {
-  id = cheapRandomId()
-  name = 'anonymous'
+  _id = cheapRandomId()
 
-  $ = { self: this } as unknown as T & { self: State<T> }
-
+  $ = { self: this } as unknown as Context<TName, TProps, TLocal>
   deps: Boxs<TProps & TLocal>
   #fxs: OffFx[] = []
 
@@ -86,6 +94,7 @@ export class State<
   abort = abort
 
   constructor(
+    public name: TName,
     public fiber: Fiber,
     public props: TProps = {} as TProps,
     public local: Class<TLocal> = class { } as Class<TLocal>
@@ -106,6 +115,8 @@ export class State<
       (_, dep: Dep<any>) =>
         dep.accessors
     )
+
+    this.$.deps = this.deps
   }
 
   get size() {
@@ -116,8 +127,8 @@ export class State<
     return this.fiber.get(this)
   }
 
-  get refs(): Refs<T> {
-    return this.deps as unknown as Refs<T>
+  get refs(): Refs<TProps & TLocal> {
+    return this.deps as unknown as Refs<TProps & TLocal>
   }
 
   // fns = <R extends (...args: any[]) => any, T extends Record<string, Func<TProps & TLocal, R>>>(obj: T): { [K in keyof T]: ReturnType<T[K]> } => {
@@ -194,11 +205,15 @@ export class State<
           name: this.name, key, args, result, listener
         }
 
-        if (stack.length === 0) {
-          printAction(action)
-        } else {
+        printAction(action)
+        // console.log(stack)
+        // if (stack.length === 0) {
+        //   // printAction(action)
+        // } else {
+        if (stack.length) {
           stack.at(-1).children.push(action)
         }
+        // }
 
       }
     }, this.name)
@@ -209,7 +224,7 @@ export class State<
     FnOptions,
     (options) =>
       <R extends (...args: any[]) => any>(fn: Func<TProps & TLocal, R>): R => {
-        const keys = argtor<StringKeys<TProps & TLocal>>(fn)
+        const keys = argtor<StringKeys<TProps & TLocal>>(fn as any)
 
         let inner: (this: any, ...args: any[]) => any
 
@@ -219,8 +234,8 @@ export class State<
 
         const outer = wrapQueue(options)(stateFn)
 
-        const updateFn = function (props: any) {
-          inner = fn(props)
+        const updateFn = function (props: any, prev: any) {
+          inner = fn(props, prev)
           Object.defineProperty(inner, 'name', { value: `${fn.name} (inner)` })
           Object.defineProperty(updateFn, 'name', { value: `${fn.name} (fn)` })
         }
@@ -249,7 +264,7 @@ export class State<
         const isDebug = !!globalThis.DEBUG && globalThis.DEBUG.includes(this.name)
 
         const keys =
-          options.keys ?? argtor(fn)
+          options.keys ?? argtor(fn as any)
 
         // throw if dependencies are missing
         const missing = keys
@@ -284,8 +299,12 @@ export class State<
 
         const self = this
 
+        let earliestPrev: any
+
         const fx = Object.assign((
-          (props, changes) => {
+          (props, changes, prev) => {
+            earliestPrev ??= prev
+
             let disposed = false
 
             this.emit('change', { fn, changes })
@@ -304,7 +323,10 @@ export class State<
                 self.on('change', listener as any)
               }
 
-              const res = qfn(props as any)
+              const p = earliestPrev
+              earliestPrev = null
+              const res = qfn(props as any, p)
+
               if (res instanceof Promise) {
                 // disposed = false
                 res.then((_dispose) => {

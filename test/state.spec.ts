@@ -10,14 +10,14 @@ describe('State', () => {
       const fiber = new Fiber()
       // const hook: Hook = Object.assign(createHook(), { fn: () => { } })
 
-      const state = new State(fiber)
+      const state = new State('foo', fiber)
       expect(state).toBeInstanceOf(State)
     })
 
     // it('runs hook initially', async () => {
     //   const fiber = new Fiber()
 
-    //   new State(fiber)
+    //   new State('foo', fiber)
     //   expect(hook.fn).toBeCalledTimes(0)
     //   await Promise.resolve()
     //   expect(hook.fn).toBeCalledTimes(1)
@@ -27,7 +27,7 @@ describe('State', () => {
       const fiber = new Fiber()
 
       const props = { foo: true }
-      const state = new State(fiber, props)
+      const state = new State('foo', fiber, props)
       expect(state.$.foo).toBe(true)
     })
 
@@ -37,7 +37,7 @@ describe('State', () => {
       class local {
         bar = true
       }
-      const state = new State(fiber, void 0, local)
+      const state = new State('foo', fiber, {}, local)
       expect(state.$.bar).toBe(true)
     })
 
@@ -48,7 +48,7 @@ describe('State', () => {
       class local {
         bar = true
       }
-      const state = new State(fiber, props, local)
+      const state = new State('foo', fiber, props, local)
       expect(state.$.foo).toBe(true)
       expect(state.$.bar).toBe(true)
     })
@@ -59,7 +59,7 @@ describe('State', () => {
       class local {
         element?: HTMLElement
       }
-      const state = new State(fiber, void 0, local)
+      const state = new State('foo', fiber, void 0, local)
       expect('element' in state.refs).toBe(true)
     })
 
@@ -67,7 +67,7 @@ describe('State', () => {
     //   const fiber = new Fiber()
 
     //   const props = { foo: void 0, json: { foo: true } }
-    //   const state = new State(fiber, props)
+    //   const state = new State('foo', fiber, props)
     //   expect(state.$.foo).toBe(true)
     // })
 
@@ -75,7 +75,7 @@ describe('State', () => {
     //   const fiber = new Fiber()
 
     //   const props = { foo: void 0, ref: { current: { json: { foo: true } } } }
-    //   const state = new State(fiber, props)
+    //   const state = new State('foo', fiber, props)
     //   expect(state.$.foo).toBe(true)
     // })
   })
@@ -86,7 +86,7 @@ describe('State', () => {
       const fiber = new Fiber()
 
       const fn = jest.fn()
-      const state = new State(fiber)
+      const state = new State('foo', fiber)
 
       state.fx(() => fn())
 
@@ -102,7 +102,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       state.fx(({ foo }) => fn(foo))
 
@@ -119,7 +119,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       state.fx(({ foo }) => fn(foo))
 
@@ -141,7 +141,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       const dispose = jest.fn()
 
@@ -169,7 +169,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       const dispose = jest.fn()
 
@@ -196,7 +196,7 @@ describe('State', () => {
     //   const fn = jest.fn(
     //     (param: any) => { results.push(param) }
     //   )
-    //   const state = new State(fiber, { foo: 'a' })
+    //   const state = new State('foo', fiber, { foo: 'a' })
 
     //   const dispose = jest.fn()
 
@@ -224,7 +224,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       const dispose = jest.fn()
 
@@ -253,7 +253,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       const dispose = jest.fn()
 
@@ -278,7 +278,7 @@ describe('State', () => {
     it('throws when dependency is missing', async () => {
       const fiber = new Fiber()
 
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       expect(() => {
         // @ts-ignore
@@ -292,7 +292,7 @@ describe('State', () => {
       const fiber = new Fiber()
 
       const fn = jest.fn()
-      const state = new State(fiber)
+      const state = new State('foo', fiber)
 
       state.fx(async () => fn())
 
@@ -308,7 +308,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       state.fx(async ({ foo }) => fn(foo))
 
@@ -325,7 +325,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       state.fx(async ({ foo }) => fn(foo))
 
@@ -347,7 +347,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       const dispose = jest.fn()
 
@@ -375,7 +375,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       const dispose = jest.fn()
 
@@ -408,7 +408,7 @@ describe('State', () => {
       const fn2 = jest.fn(
         (param: any) => { results2.push(param) }
       )
-      const state = new State(fiber, { foo: 'a', bar: 'b' })
+      const state = new State('foo', fiber, { foo: 'a', bar: 'b' })
 
       const dispose = jest.fn()
 
@@ -452,7 +452,7 @@ describe('State', () => {
       const fn2 = jest.fn(
         (param: any) => { results2.push(param) }
       )
-      const state = new State(fiber, { foo: 'a', bar: 'b' })
+      const state = new State('foo', fiber, { foo: 'a', bar: 'b' })
 
       const dispose = jest.fn()
 
@@ -490,7 +490,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       const dispose = jest.fn()
 
@@ -525,7 +525,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       let count = 0
 
@@ -561,7 +561,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       const dispose = jest.fn()
 
@@ -585,7 +585,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       const dispose = jest.fn()
 
@@ -613,7 +613,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       const dispose = jest.fn()
 
@@ -643,7 +643,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' })
+      const state = new State('foo', fiber, { foo: 'a' })
 
       const dispose = jest.fn()
 
@@ -679,7 +679,7 @@ describe('State', () => {
       const fn = jest.fn(
         (param: any) => { results.push(param) }
       )
-      const state = new State(fiber, { foo: 'a' as any })
+      const state = new State('foo', fiber, { foo: 'a' as any })
 
       const dispose = jest.fn()
 
@@ -715,7 +715,7 @@ describe('State', () => {
       const fn2 = jest.fn(
         (param: any) => { results2.push(param) }
       )
-      const state = new State(fiber, { foo: 'a', bar: 'b' })
+      const state = new State('foo', fiber, { foo: 'a', bar: 'b' })
 
       const dispose = jest.fn()
 
@@ -768,7 +768,7 @@ describe('State', () => {
       const fn2 = jest.fn(
         (param: any) => { results2.push(param) }
       )
-      const state = new State(fiber, { foo: 'a', bar: 'b' })
+      const state = new State('foo', fiber, { foo: 'a', bar: 'b' })
 
       const dispose = jest.fn(() => {
         // debugger
@@ -834,7 +834,7 @@ describe('State', () => {
       const fn2 = jest.fn(
         (param: any) => { results2.push(param) }
       )
-      const state = new State(fiber, { foo: 'a', bar: 'b' })
+      const state = new State('foo', fiber, { foo: 'a', bar: 'b' })
 
       const dispose = jest.fn()
 
@@ -889,7 +889,7 @@ describe('State', () => {
       const fn2 = jest.fn(
         (param: any) => { results2.push(param) }
       )
-      const state = new State(fiber, { foo: 'a', bar: 'b' })
+      const state = new State('foo', fiber, { foo: 'a', bar: 'b' })
 
       let toggle = false
       let count = 0
@@ -952,7 +952,7 @@ describe('State', () => {
       const fiber = new Fiber()
 
       const fn = jest.fn()
-      const state = new State(fiber)
+      const state = new State('foo', fiber)
 
       state.fx(() => fn())
       expect(state.size).toBe(1)
@@ -975,7 +975,7 @@ describe('State', () => {
   //     const a = jest.fn()
   //     const b = jest.fn()
   //     const c = jest.fn()
-  //     const state = new State(fiber)
+  //     const state = new State('foo', fiber)
 
   //     // size + 1 for the hook
   //     expect(state.size).toBe(1)
