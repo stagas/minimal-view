@@ -87,10 +87,10 @@
   },
   "dependencies": {
     "argtor": "^3.0.0",
-    "event-toolkit": "^1.2.0",
+    "event-toolkit": "^1.3.0",
     "everyday-types": "^1.1.0",
     "everyday-utils": "^1.5.0",
-    "html-vdom": "^2.4.0",
+    "html-vdom": "^2.5.0",
     "minimal-reactive": "^1.3.0",
     "nested-css": "^3.0.8",
     "proxy-toolkit": "^1.2.0",

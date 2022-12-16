@@ -29,13 +29,14 @@ export type Component<TName extends string = '', TProps = {}, TLocal = {}> = (
 // export type Context<T extends Component<any, TProps, TLocal>, TProps = {}, TLocal = {}> = TProps & TLocal
 
 export function web<TName extends string = '', TProps = {}, TLocal = {}>(
-  fn: View<TName, TProps, TLocal & { css?: string }>,
+  fn: View<TName, TProps, TLocal>,
   options?: Options<TProps>,
   parent: typeof HTMLElement = HTMLElement
 ): WebElement<TName, TProps, TLocal>['Web'] {
   fn.defaultProps = { css: '' }
   fn.onInit = (state, update) => {
     // state.name = name
+    // @ts-ignore
     state.fx(function updateCss({ css }) {
       (state.$ as any).__style =
         jsx('style', { children: makeCss`${css}`() }, void 0)
