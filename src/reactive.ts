@@ -2,6 +2,8 @@
 import { Class } from 'everyday-types'
 import { State } from './state'
 import { fiber } from './fiber'
+import { Dep, deps } from 'minimal-reactive'
+import { accessors } from 'everyday-utils'
 
 export type Reactive<TName extends string = any, TProps = any, TLocal = any> = State<TName, TProps, TLocal>
 
@@ -35,7 +37,16 @@ export function reactive<TName extends string, TProps, TLocal, TActions, TEffect
 
     state.name = name
 
-    Object.assign(state.$, actions(state))
+    const fns = deps(actions(state) as any)
+
+    accessors(
+      state.$,
+      fns,
+      (_, dep: Dep<any>) =>
+        dep.accessors
+    )
+
+    Object.assign(state.deps, fns)
 
     const stateWithActions = state as Reactive<TName, TProps, TLocal & TActions>
 

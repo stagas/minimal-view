@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { queue } from 'event-toolkit'
 import { Class } from 'everyday-types'
+import { accessors } from 'everyday-utils'
 // import { WeakMapFactory } from 'everyday-utils'
-import { effect } from 'minimal-reactive'
+import { Dep, deps, effect } from 'minimal-reactive'
 
 export * from 'everyday-types'
 
 import { fiber } from './fiber'
 import { hook, Hook } from './jsx-runtime'
-import { Deps, State } from './state'
+import { State } from './state'
 
 export * from './web'
 
@@ -40,24 +41,19 @@ export type ViewLocal = {
   __style: string,
 }
 
+export type ViewState<TName extends string, TProps, TLocal> =
+  State<TName, TProps, TLocal & ViewLocal>
+
 export type View<TName extends string, TProps, TLocal> = {
   (props: TProps): JSX.Element
-  $: State<TName, Deps<TProps>, TLocal>['$']
+  $: ViewState<TName, TProps, TLocal>['$']
   Data: TProps & TLocal
-  Hook: Hook<{ state: State<TName, TProps, TLocal> }>
+  Hook: Hook<{ state: ViewState<TName, TProps, TLocal> }>
   viewName: TName
   defaultProps?: Record<string, unknown>
   local?: TLocal
-  onInit?: (state: State<TName, TProps, TLocal>, update: () => void) => void
+  onInit?: (state: ViewState<TName, TProps, TLocal>, update: () => void) => void
 }
-
-// export type ViewState<TName extends string, TProps, TLocal> =
-//   State<TName, TProps, TLocal & ViewLocal>
-//  & {
-//   $: ViewState<TName, TProps, TLocal> & {
-//     self: ViewState<TName, TProps, TLocal>, deps: Boxs<TProps & TLocal>
-//   }
-// }>
 
 export function view<
   TName extends string,
@@ -65,17 +61,17 @@ export function view<
   TLocal,
   TActions,
   TEffect extends (
-    state: State<TName, TProps, ViewLocal & TLocal & TActions>
-  ) => (($: TProps & TLocal) => void) | void
+    state: ViewState<TName, TProps, TLocal & TActions>
+  ) => (($: TProps & TLocal & TActions) => void) | void
 >(
   name: TName,
   defaultProps: Class<TProps>,
   local: Class<TLocal>,
   actions: (
-    state: State<TName, TProps, ViewLocal & TLocal>
+    state: ViewState<TName, TProps, TLocal>
   ) => TActions,
   fn: TEffect
-): View<TName, TProps, ViewLocal & TLocal & TActions> {
+): View<TName, TProps, TLocal & TActions> {
   // if (!isClass(local)) {
   //   // @ts-ignore
   //   fn = local; local = class { }
@@ -83,8 +79,8 @@ export function view<
 
   const viewFunc: View<TName, TProps, ViewLocal & TLocal> = function viewFn(props: TProps) {
     const self = hook as Hook<{
-      state: State<TName, TProps, ViewLocal & TLocal>,
-      __dispose: ($: State<TName, TProps, TLocal>['$']) => void
+      state: ViewState<TName, TProps, TLocal>,
+      __dispose: ($: TProps & TLocal & TActions) => void
     }>
 
     self.state ??= (() => {
@@ -99,7 +95,18 @@ export function view<
           ...props
         },
         local as any
-      ) as State<TName, TProps, ViewLocal & TLocal>
+      ) as ViewState<TName, TProps, TLocal>
+
+      const fns = deps(actions(state) as any)
+
+      accessors(
+        state.$,
+        fns,
+        (_, dep: Dep<any>) =>
+          dep.accessors
+      )
+
+      Object.assign(state.deps, fns)
 
       const update = queue.task(self)
 
@@ -110,7 +117,7 @@ export function view<
       })
 
       self.once('remove', () => {
-        self.__dispose?.(state.$)
+        self.__dispose?.(state.$ as any)
         state.dispose()
       })
 
@@ -118,8 +125,7 @@ export function view<
     })()
 
     if (!self.__dispose) {
-      Object.assign(self.state.$, actions(self.state))
-      const stateWithActions = self.state as State<TName, TProps, ViewLocal & TLocal & TActions>
+      const stateWithActions = self.state as ViewState<TName, TProps, TLocal & TActions>
       self.__dispose ??= (fn(stateWithActions) ?? (() => { }))
     }
 

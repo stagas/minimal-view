@@ -26,8 +26,9 @@ export class Fiber extends EventEmitter<{
         this.#lane = new Lane()
         lane.laneRun()
         // await new Promise(resolve => setTimeout(resolve, 5))
-        // await Promise.resolve()
-
+        // if (this.#lane.size) {
+        //   await Promise.resolve()
+        // }
       }
     } finally {
       this.#running = false
@@ -36,18 +37,19 @@ export class Fiber extends EventEmitter<{
   }
 
   get(obj: object) {
-    let lane = this.#lanes.get(obj)
+    // let lane = this.#lanes.get(obj)
 
-    if (!lane) {
-      this.#lanes.set(obj, lane = this.#lane)
+    // if (!lane) {
+    // this.#lanes.set(obj, lane = this.#lane)
+    this.#lanes.set(obj, this.#lane)
 
-      if (!this.#running) {
-        this.#running = true
-        queueMicrotask(this.#runLanes)
-      }
+    if (!this.#running) {
+      this.#running = true
+      queueMicrotask(this.#runLanes)
     }
+    // }
 
-    return lane
+    return this.#lane
   }
 }
 

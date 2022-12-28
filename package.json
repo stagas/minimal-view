@@ -3,7 +3,7 @@
   "author": "stagas",
   "short": "stagas/minimal-view",
   "description": "Minimal reactive component view library.",
-  "version": "1.2.1",
+  "version": "1.3.0",
   "license": "MIT",
   "repository": {
     "type": "git",
@@ -21,12 +21,19 @@
     "./jsx-runtime": {
       "import": "./dist/esm/jsx-runtime.js",
       "require": "./dist/cjs/jsx-runtime.js"
+    },
+    "./reactive": {
+      "import": "./dist/esm/reactive.js",
+      "require": "./dist/cjs/reactive.js"
     }
   },
   "typesVersions": {
     "*": {
       "jsx-runtime": [
         "./dist/types/jsx-runtime.d.ts"
+      ],
+      "reactive": [
+        "./dist/types/reactive.d.ts"
       ]
     }
   },
@@ -89,9 +96,9 @@
     "argtor": "^3.0.0",
     "event-toolkit": "^1.3.0",
     "everyday-types": "^1.1.0",
-    "everyday-utils": "^1.5.0",
-    "html-vdom": "^2.5.0",
-    "minimal-reactive": "^1.3.0",
+    "everyday-utils": "^1.6.0",
+    "html-vdom": "^2.6.0",
+    "minimal-reactive": "^1.4.0",
     "nested-css": "^3.0.8",
     "proxy-toolkit": "^1.2.0",
     "to-fluent": "^2.2.0"

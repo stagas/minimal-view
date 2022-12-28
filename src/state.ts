@@ -273,7 +273,7 @@ export class State<
           )
 
         if (missing.length) {
-          throw new TypeError(`Missing dependencies: ${missing}\n${keys.source}`)
+          throw new TypeError(`Missing dependencies: ${JSON.stringify(missing)}\n${keys.source}`)
         }
 
         const deps = pick(this.deps, keys as any)
@@ -376,7 +376,7 @@ export class State<
           effect(deps, fx),
           () => {
             if (isDebug) {
-              console.log('dispose:', fn.name)
+              console.warn(`dispose[${this.name}]:`, fn.name || '(anonymous)')
             }
             // cache.delete(id)
             dispose?.()
