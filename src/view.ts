@@ -144,3 +144,20 @@ export function view<
 
   return viewFunc as any
 }
+
+export function part(fn: (update: (view: JSX.Element) => void) => void) {
+  let update: any
+  let view: any
+
+  const trigger = (newView: any) => {
+    view = newView
+    update?.()
+  }
+
+  fn(trigger)
+
+  return () => {
+    update = hook
+    return view
+  }
+}
