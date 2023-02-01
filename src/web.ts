@@ -20,6 +20,7 @@ export type Component<TName extends string = '', TProps = {}, TLocal = {}> = (
   (props: TProps) => JSX.Element
 ) & {
   Fn: (props: TProps) => JSX.Element
+  State: ViewState<TName, TProps, TLocal>
   Context: ViewState<TName, TProps, TLocal>['$']
   Element: Class<HTMLElement & { $: ViewState<TName, TProps, TLocal>['$'] }>
   toString(): string
@@ -45,6 +46,7 @@ export function web<TName extends string = '', TProps = {}, TLocal = {}>(
     jsx(tag, props, void 0)
 
   Web.Fn = fn as any
+  Web.State = {} as any
   Web.Context = {} as any
   Web.toString = () => tag!
 
