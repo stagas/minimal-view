@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/ban-types */
 import { Change, Boxs, Dep, OffFx, effect, deps, Fx } from 'minimal-reactive'
-import { toFluent, pick, accessors, cheapRandomId, once, bool, EventEmitter, debugObjectMethods, ansiColorFor, padEnd } from 'everyday-utils'
+import { toFluent, pick, accessors, cheapRandomId, once, bool, EventEmitter, debugObjectMethods, ansiColorFor, padEnd, Off } from 'everyday-utils'
 import { abort, chain, QueueOptions, wrapQueue } from 'event-toolkit'
 import { Class, StringKeys } from 'everyday-types'
 import { VRef } from 'html-vdom'
@@ -331,7 +331,10 @@ export class State<
               if (res instanceof Promise) {
                 // disposed = false
                 res.then((_dispose) => {
-                  if (last === _dispose) return
+                  if (last === _dispose) {
+                    if (options.once) off()
+                    return
+                  }
                   last = _dispose
 
                   if (disposed) _dispose?.()
@@ -373,7 +376,7 @@ export class State<
           { source: keys.source }
         )
 
-        const off = once(chain(
+        const off: Off = once(chain(
           effect(deps, fx),
           () => {
             if (isDebug) {
