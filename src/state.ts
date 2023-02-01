@@ -42,7 +42,7 @@ function printSideEffects(allChanges: [string, Change[]][]) {
 }
 
 export class FnOptions<T> extends QueueOptions {
-  keys?: string[] & { source: string }
+  keys?: string[] & { source?: string }
 }
 
 export class EffectOptions<T> extends FnOptions<T> {
@@ -130,15 +130,6 @@ export class State<
   get refs(): Refs<TProps & TLocal> {
     return this.deps as unknown as Refs<TProps & TLocal>
   }
-
-  // fns = <R extends (...args: any[]) => any, T extends Record<string, Func<TProps & TLocal, R>>>(obj: T): { [K in keyof T]: ReturnType<T[K]> } => {
-  //   return Object.fromEntries(
-  //     Object.entries(obj as any)
-  //       .map(([key, value]) => {
-  //         return [key, this.fn(value)]
-  //       }) as any
-  //   ) as any
-  // }
 
   fns = <V>(obj: V): V => {
     const changes = new Map()
@@ -274,7 +265,7 @@ export class State<
           )
 
         if (missing.length) {
-          throw new TypeError(`Missing dependencies: ${JSON.stringify(missing)}\n${keys.source}`)
+          throw new TypeError(`Missing dependencies: ${JSON.stringify(missing)}\n${keys.source ?? '(no source)'}`)
         }
 
         const deps = pick(this.deps, keys as any)
@@ -397,50 +388,3 @@ export class State<
     chain(this.#fxs.splice(0))()
   }
 }
-
-// export const State = _State as {
-//   new <TProps, TLocal>(
-//     // hook: Hook,
-//     fiber: Fiber,
-//     props?: TProps,
-//     local?: Class<TLocal>
-//   ): State<TProps, TLocal>
-// }
-
-// export interface Stateful<
-//   TProps = {},
-//   TLocal = {},
-// > {
-//   $: Required<State<TProps, TLocal>>
-// }
-
-// export type StateOf<T extends Stateful<any>> = {
-//   [U in keyof T['$']['deps']]-?:
-//   T['$'][U] extends Stateful<any>
-//   ? StateOf<T['$'][U]>
-//   : T['$'][U]
-// }
-
-// export type StatefulObjects<T> = {
-//   [K in keyof T as T[K] extends Stateful<any> ? K : never]-?: T[K] extends Stateful<any>
-//   ? StateOf<T[K]>
-//   : never
-// }
-
-// type Pick<T> = StatefulObjects<Required<T>>
-
-// export type State<
-//   TProps = {},
-//   TLocal = {},
-// > =
-//   // & (TProps extends void ? void : TProps)
-//   // & (TLocal extends void ? void : TLocal)
-//   & _State<TProps & TLocal>
-  // & {
-  //   pick: <R>(fn: (deps: Pick<T>) => R) =>
-  //     State<TProps, TLocal & R>
-  //   reduce: <R>(fn: (deps: TProps & TLocal) => R) =>
-  //     State<TProps, TLocal & R>
-  //   // <R>(fn: (deps: TProps & TLocal) => R):
-  //   //   State<TProps & R, TLocal>
-  // }
