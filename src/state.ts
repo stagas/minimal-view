@@ -226,7 +226,7 @@ export class State<
       <R extends (...args: any[]) => any>(fn: Func<TProps & TLocal, R>): R => {
         const keys = argtor<StringKeys<TProps & TLocal>>(fn as any)
 
-        let inner: (this: any, ...args: any[]) => any
+        let inner: ((this: any, ...args: any[]) => any) & { dispose: () => void }
 
         function stateFn(this: any, ...args: any[]) {
           return inner?.apply(this, args as any)
@@ -235,12 +235,13 @@ export class State<
         const outer = wrapQueue(options)(stateFn)
 
         const updateFn = function (props: any, prev: any) {
-          inner = fn(props, prev)
+          if (inner != null && 'dispose' in inner) inner.dispose()
+          inner = fn(props, prev) as any
           Object.defineProperty(inner, 'name', { value: `${fn.name} (inner)` })
           Object.defineProperty(updateFn, 'name', { value: `${fn.name} (fn)` })
         }
 
-        this.fx.keys(keys)(updateFn)
+          ; (outer as any).dispose = this.fx.keys(keys as any)(updateFn)
 
         Object.defineProperty(outer, 'key', {
           set(x: string) {
