@@ -146,10 +146,10 @@ export function view<
 }
 
 export function part(fn: (update: (view: JSX.Element) => void) => void) {
-  let update: any
-  let view: any
+  let update: () => void
+  let view: JSX.Element = false
 
-  const trigger = (newView: any) => {
+  const trigger = (newView: JSX.Element) => {
     view = newView
     update?.()
   }
